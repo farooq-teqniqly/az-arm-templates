@@ -1,0 +1,85 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventhubs_namespace_name": {
+            "type": "string",
+            "defaultValue": "eventhubns",
+            "metadata": {
+                "description": "Specifies the Event Hub Namespace name."
+            }
+        },
+        "eventhubs_eventhub_name": {
+            "type": "string",
+            "defaultValue": "eventhubdemo",
+            "metadata": {
+                "description": "Specifies the Event Hub name."
+            }
+        },
+        "eventhubs_consumergroup_name": {
+            "type": "string",
+            "defaultValue": "$Default",
+            "metadata": {
+                "description": "Specifies the consumer group of the Event Hub."
+            }
+        },
+        "kusto_cluster_name": {
+            "type": "string",
+            "defaultValue": "kustocluster",
+            "metadata": {
+                "description": "Specifies the name of the cluster"
+            }
+        },
+        "kusto_database_name": {
+            "type": "string",
+            "defaultValue": "kustodb",
+            "metadata": {
+                "description": "Specifies the name of the database"
+            }
+        },
+        "dataconnection_name": {
+            "type": "string",
+            "defaultValue": "kustodc",
+            "metadata": {
+                "description": "Name of the data connection to create"
+            }
+        },
+        "subscriptionId": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]",
+            "metadata": {
+                "description": "Specifies the subscriptionId of the Event Hub"
+            }
+        },
+        "resourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Specifies the resourceGroup of the Event Hub"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [{
+            "type": "Microsoft.Kusto/Clusters/Databases/DataConnections",
+            "apiVersion": "2019-09-07",
+            "name": "[concat(parameters('kusto_cluster_name'), '/', parameters('kusto_database_name'), '/', parameters('dataconnection_name'))]",
+            "location": "[parameters('location')]",
+            "kind": "EventHub",
+            "properties": {
+                "eventHubResourceId": "[resourceId(parameters('subscriptionId'), parameters('resourceGroup'), 'Microsoft.EventHub/namespaces/eventhubs', parameters('eventhubs_namespace_name'), parameters('eventhubs_eventhub_name'))]",
+                "consumerGroup": "[parameters('eventhubs_consumergroup_name')]",
+                "tableName": "",
+                "mappingRuleName": "",
+                "dataFormat": ""
+            }
+        }
+    ]
+}
